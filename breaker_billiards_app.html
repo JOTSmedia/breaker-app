@@ -645,10 +645,16 @@ nav .badge{animation:chipPop .4s cubic-bezier(.34,1.56,.64,1)}
 .pn{display:flex;align-items:center;gap:11px;padding:9px 0;
   border-bottom:1px solid rgba(168,200,236,.09)}
 .pn:last-child{border-bottom:0}
-.pn input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--chalk);
+.pn input{flex:1;min-width:0;border:0;outline:none;color:var(--chalk);
   font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.05em;
-  text-transform:uppercase;padding:6px 0;border-bottom:1px dashed rgba(168,200,236,.2)}
-.pn input:focus{color:var(--gold);border-bottom-color:rgba(212,175,55,.55)}
+  text-transform:uppercase;padding:7px 10px;border-radius:9px;
+  background:rgba(5,10,22,.5);border:1px dashed rgba(168,200,236,.32);transition:.18s}
+.pn input:hover{border-color:rgba(212,175,55,.45)}
+.pn input:focus{color:var(--gold);background:rgba(10,26,56,.9);
+  border-style:solid;border-color:rgba(212,175,55,.65)}
+.pn-pencil{flex:0 0 auto;width:15px;height:15px;stroke:rgba(168,200,236,.5);fill:none;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s}
+.pn:focus-within .pn-pencil{stroke:var(--gold)}
 .pnames{margin-top:6px}
 
 /* billiard balls */
@@ -1493,7 +1499,7 @@ try{
       <div class="chips" id="gameSel" role="group" aria-label="Which game"></div>
       <button class="rules-link" id="cfgRulesLink">Rules</button>
       <div class="cfg-rules" id="cfgRules" hidden></div>
-      <div class="eyebrow" style="margin-top:20px">Players</div>
+      <div class="eyebrow" style="margin-top:20px">Players <span class="lt">· Tap A Name To Edit</span></div>
       <div class="chips" id="pCount" role="group" aria-label="Number of players"></div>
       <div class="pnames" id="pNames"></div>
       <button class="btn btn-go" id="cfgStart" style="width:100%;margin-top:20px">Start Scoring</button>
@@ -2350,8 +2356,9 @@ function paintLive(){
     txt.textContent = (open ? 'Open · ' : '') + s.now.title +
       ' · Ends in ' + countdown(s.now.end - now);
   } else if(open){
-    txt.textContent = 'Open · No special running';
-    bar.classList.add('off');
+    /* nothing on is implied by the absence of a special — just say Open, and
+       leave it lit, because being open is the live state either way */
+    txt.textContent = 'Open';
   } else {
     txt.textContent = 'No special right now';
     bar.classList.add('off');
@@ -3020,9 +3027,13 @@ function paintSetup(){
   $('#pCount').innerHTML = [2,3,4].map(n =>
     `<button class="chip ${n === nPlayers() ? 'on' : ''}${need && n !== need ? ' dim' : ''}"
        data-n="${n}">${n}</button>`).join('');
+  /* a pencil on every row so the names read as fields, not a printed list */
   $('#pNames').innerHTML = SC.names.map((nm, i) =>
     `<div class="pn">${ball(i + 1, true)}
-      <input data-i="${i}" value="${esc(nm)}" maxlength="14" aria-label="Player ${i+1} name"></div>`).join('');
+      <input data-i="${i}" value="${esc(nm)}" maxlength="14" aria-label="Player ${i+1} name">
+      <svg class="pn-pencil" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 20h4L18.5 9.5a2.83 2.83 0 10-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>
+      </div>`).join('');
 }
 function setPlayers(n){
   const cur = nPlayers();
